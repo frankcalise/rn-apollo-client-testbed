@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
+    "adb": "adb reverse tcp:8097 tcp:8097",
     "build:android:development": "npx eas-cli build --profile=development --platform=android",
     "build:ios:development": "npx eas-cli build --profile=development --platform=ios",
     "build:ios:simulator": "npx eas-cli build --profile=simulator --platform=ios",
