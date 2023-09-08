@@ -45,7 +45,11 @@ export default function Missions() {
           onRefresh={() => result.refetch()}
           renderItem={({ item, index }) => {
             return (
-              <Link asChild href={`/launch/${item.id}`}>
+              <Link
+                asChild
+                href={`/launch/${item.id}`}
+                key={`${item.id}-${index}`}
+              >
                 <Pressable
                   flexDirection="row"
                   alignItems="baseline"
