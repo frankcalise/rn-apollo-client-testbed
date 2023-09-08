@@ -1,14 +1,14 @@
 import { useQuery } from "@apollo/client";
 import { Stack, useLocalSearchParams } from "expo-router";
 import { useMemo } from "react";
-import { ScrollView } from "react-native-gesture-handler";
 import { Box, Link, Pressable, Text } from "../../src/components";
 import { LaunchListDocument } from "../../src/queries";
 import { isDefined } from "../../src/utils";
+import { ScrollView, FlatList } from "react-native";
 
 export default function Missions() {
   // either "cache-first" or "no-cache" coming from index
-  const { fetchPolicy } = useLocalSearchParams();
+  const { fetchPolicy, flatList } = useLocalSearchParams();
   const result = useQuery(LaunchListDocument, { fetchPolicy });
   const launches = useMemo(() => {
     const launchData = (result.data?.launches ?? [])
@@ -33,14 +33,42 @@ export default function Missions() {
     );
   }
 
+  const renderFlatList = flatList === "true";
+
+  if (renderFlatList) {
+    return (
+      <>
+        <Stack.Screen options={{ title: "Launch Overview" }} />
+        <FlatList
+          data={launches}
+          refreshing={result.loading}
+          onRefresh={() => result.refetch()}
+          renderItem={({ item, index }) => {
+            return (
+              <Link asChild href={`/launch/${item.id}`}>
+                <Pressable
+                  flexDirection="row"
+                  alignItems="baseline"
+                  justifyContent="space-between"
+                  borderTopWidth={index ? 1 : 0}
+                  padding="s"
+                >
+                  <Text fontSize={16}>{item.mission_name}</Text>
+                  <Text>{item.launch_date_unix}</Text>
+                </Pressable>
+              </Link>
+            );
+          }}
+        />
+      </>
+    );
+  }
+
+  // ScrollView version experiencing more lag
   return (
     <>
       <Stack.Screen options={{ title: "Launch Overview" }} />
-      <ScrollView
-        data={launches}
-        refreshing={result.loading}
-        onRefresh={() => result.refetch()}
-      >
+      <ScrollView>
         {launches.map((item, index) => {
           return (
             <Link
