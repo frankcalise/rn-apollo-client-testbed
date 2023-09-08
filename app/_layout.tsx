@@ -1,7 +1,6 @@
 import { ApolloClient, ApolloProvider, InMemoryCache } from "@apollo/client";
 import { ThemeProvider } from "@shopify/restyle";
 import { Stack } from "expo-router";
-import { Box, Text } from "../src/components";
 import theme from "../src/components/theme";
 import { apolloDevToolsInit } from "react-native-apollo-devtools-client";
 

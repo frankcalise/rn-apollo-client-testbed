@@ -61,7 +61,7 @@ const theme = createTheme({
       flex: 1,
     },
     page: {
-      padding: "m",
+      padding: "s",
       alignItems: "center",
     },
     centered: {
@@ -98,6 +98,15 @@ const theme = createTheme({
     heading2: {
       color: "headingTextAlternativeColor",
       fontSize: 24,
+    },
+    step: {
+      fontSize: 16,
+      fontWeight: "bold",
+    },
+    observe: {
+      fontSize: 16,
+      fontStyle: "italic",
+      marginLeft: "l",
     },
   },
 });

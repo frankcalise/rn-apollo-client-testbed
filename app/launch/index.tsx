@@ -1,38 +1,53 @@
 import { useQuery } from "@apollo/client";
-import { Stack } from "expo-router";
+import { Stack, useLocalSearchParams } from "expo-router";
 import { useMemo } from "react";
-import { FlatList } from "react-native-gesture-handler";
+import { ScrollView } from "react-native-gesture-handler";
 import { Box, Link, Pressable, Text } from "../../src/components";
 import { LaunchListDocument } from "../../src/queries";
 import { isDefined } from "../../src/utils";
 
 export default function Missions() {
-  const result = useQuery(LaunchListDocument);
-  const launches = useMemo(
-    () =>
-      (result.data?.launches ?? []).filter(isDefined).map((launch) => ({
+  // either "cache-first" or "no-cache" coming from index
+  const { fetchPolicy } = useLocalSearchParams();
+  const result = useQuery(LaunchListDocument, { fetchPolicy });
+  const launches = useMemo(() => {
+    const launchData = (result.data?.launches ?? [])
+      .filter(isDefined)
+      .map((launch) => ({
         ...launch,
-        launch_date_unix: new Date(launch.launch_date_unix * 1000).toLocaleDateString(),
-      })),
-    [result.data?.launches]
-  );
+        launch_date_unix: new Date(
+          launch.launch_date_unix * 1000
+        ).toLocaleDateString(),
+      }));
+
+    // make a bunch of data to exaggerate
+    return [...launchData, ...launchData, ...launchData];
+  }, [result.data?.launches]);
+
+  // display loading message while hitting network
+  if (result.loading) {
+    return (
+      <Box variant="centered">
+        <Text>loading</Text>
+      </Box>
+    );
+  }
+
   return (
     <>
       <Stack.Screen options={{ title: "Launch Overview" }} />
-      <FlatList
+      <ScrollView
         data={launches}
         refreshing={result.loading}
         onRefresh={() => result.refetch()}
-        ListEmptyComponent={
-          result.loading ? (
-            <Box variant="centered">
-              <Text>loading</Text>
-            </Box>
-          ) : undefined
-        }
-        renderItem={({ item, index }) => {
+      >
+        {launches.map((item, index) => {
           return (
-            <Link asChild href={`/launch/${item.id}`}>
+            <Link
+              asChild
+              href={`/launch/${item.id}`}
+              key={`${item.id}-${index}`}
+            >
               <Pressable
                 flexDirection="row"
                 alignItems="baseline"
@@ -45,8 +60,8 @@ export default function Missions() {
               </Pressable>
             </Link>
           );
-        }}
-      />
+        })}
+      </ScrollView>
     </>
   );
 }
